@@ -16,7 +16,6 @@
     justify-content: center;
 }
 
-
 .month-column {
     position: relative;
     grid-row: 2 / span 31;
@@ -24,26 +23,30 @@
     border-right: 1px solid #eee;
 
     background-image:
-        repeating-linear-gradient(
+    repeating-linear-gradient(
             to bottom,
             rgba(0,0,0,0.02),
             rgba(0,0,0,0.02) calc(100% / 62),
             transparent calc(100% / 62),
             transparent calc(100% / 31)
-        ),
-        repeating-linear-gradient(
-            to bottom,
-            transparent,
-            transparent calc((100% / 31) - 1px),
-            #f3f3f3 calc((100% / 31) - 1px),
-            #f3f3f3 calc(100% / 31)
-        );
+    ),
+    repeating-linear-gradient(
+        to bottom,
+        transparent,
+        transparent calc((100% / 31) - 1px),
+        #f3f3f3 calc((100% / 31) - 1px),
+        #f3f3f3 calc(100% / 31)
+    );
+}
+
+.month-column:hover {
+    box-shadow: inset 0 0 0 2px rgba(0,0,0,0.08);
 }
 
 .day-line {
     height: 1fr;
 }
-
+        
 .vacation-bar {
     position: absolute;
     width: 10px;
@@ -56,4 +59,18 @@
     background-color: rgba(0, 0, 0, 0.05);
     pointer-events: none;
     display: none;
+}
+
+#employee-panel {
+    margin: 15px 0;
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.employee-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
 }

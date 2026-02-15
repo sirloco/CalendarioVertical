@@ -5,28 +5,21 @@ const BAR_WIDTH = 12;
 const BAR_GAP = 4;
 const COLUMN_PADDING = 6;
 
-
 let empleados = [
     {
         nombre: "Irune",
         color: "#f87171",
-        vacaciones: [
-            { inicio: `${currentYear}-06-10`, fin: `${currentYear}-06-18` }
-        ]
+        vacaciones: [ { inicio: `${currentYear}-06-10`, fin: `${currentYear}-06-18` }]
     },
     {
         nombre: "Esther",
         color: "#60a5fa",
-        vacaciones: [
-            { inicio: `${currentYear}-06-15`, fin: `${currentYear}-06-25` }
-        ]
+        vacaciones: [{ inicio: `${currentYear}-06-15`, fin: `${currentYear}-06-25` }]
     },
     {
         nombre: "Santi",
         color: "#34d399",
-        vacaciones: [
-            { inicio: `${currentYear}-07-01`, fin: `${currentYear}-07-10` }
-        ]
+        vacaciones: [{ inicio: `${currentYear}-07-01`, fin: `${currentYear}-07-10` }]
     }
 ];
 
@@ -43,11 +36,9 @@ calendar.appendChild(emptyCorner);
     header.classList.add("cell");
     header.style.fontWeight = "bold";
 
-    let monthName = new Date(currentYear, monthIndex, 1)
-        .toLocaleString("es-ES", { month: "long" });
+    let monthName = new Date(currentYear, monthIndex, 1).toLocaleString("es-ES", { month: "long" });
 
-    header.textContent =
-        monthName.charAt(0).toUpperCase() + monthName.slice(1);
+    header.textContent = monthName.charAt(0).toUpperCase() + monthName.slice(1);
 
     calendar.appendChild(header);
 });
@@ -83,15 +74,11 @@ function ajustarAnchoColumnas() {
 
     let totalCarriles = empleados.length;
 
-    let columnWidth =
-        COLUMN_PADDING +
-        totalCarriles * (BAR_WIDTH + BAR_GAP);
+    let columnWidth = COLUMN_PADDING + totalCarriles * (BAR_WIDTH + BAR_GAP);
 
     let monthColumns = document.querySelectorAll(".month-column");
 
-    monthColumns.forEach(col => {
-        col.style.minWidth = columnWidth + "px";
-    });
+    monthColumns.forEach(col => { col.style.minWidth = columnWidth + "px"; });
 }
 
 function pintarVacaciones() {
@@ -222,18 +209,31 @@ function actualizarInfoBar(dia, mes) {
     if (empleadosActivos.length === 0) {
         infoBar.textContent = "";
     } else {
-        infoBar.textContent =
-            `📅 ${fechaTexto} — Vacaciones: ${empleadosActivos.join(", ")}`;
+        infoBar.textContent = `📅 ${fechaTexto} — Vacaciones: ${empleadosActivos.join(", ")}`;
     }
 }
 
-calendar.addEventListener("mousemove", (e) => {
+let calendarMetrics;
 
-    let calendarRect = calendar.getBoundingClientRect();
-    let y = e.clientY - calendarRect.top;
-    let x = e.clientX - calendarRect.left;
-
+function calcularDimensiones() {
+    let calRect = calendar.getBoundingClientRect();
     let headerHeight = 40;
+
+    calendarMetrics = {
+        top: calRect.top,
+        height: calRect.height,
+        dayHeight: (calRect.height - headerHeight) / 31,
+        headerHeight
+    };
+}
+
+window.addEventListener("load", calcularDimensiones);
+window.addEventListener("resize", calcularDimensiones);
+
+calendar.addEventListener("mousemove", (e) => {
+    let { top, dayHeight, headerHeight } = calendarMetrics;
+
+    let y = e.clientY - top;
 
     if (y <= headerHeight) {
         hoverLine.style.display = "none";
@@ -241,38 +241,37 @@ calendar.addEventListener("mousemove", (e) => {
         return;
     }
 
-    let dayHeight = (calendarRect.height - headerHeight) / 31;
     let dayIndex = Math.floor((y - headerHeight) / dayHeight);
 
-    if (dayIndex < 0 || dayIndex >= 31) {
-        hoverLine.style.display = "none";
-        actualizarInfoBar(null, null);
-        return;
-    }
+    if (dayIndex >= 0 && dayIndex < 31) {
+        hoverLine.style.display = "block";
+        hoverLine.style.top = (headerHeight + dayIndex * dayHeight) + "px";
+        hoverLine.style.height = dayHeight + "px";
 
-    hoverLine.style.display = "block";
-    hoverLine.style.top = (headerHeight + dayIndex * dayHeight) + "px";
-    hoverLine.style.height = dayHeight + "px";
+            // 🔹 Detectar mes por posición horizontal
+        let monthColumns = document.querySelectorAll(".month-column");
 
-    // 🔹 Detectar mes por posición horizontal
-    let monthColumns = document.querySelectorAll(".month-column");
+        let mesDetectado = null;
 
-    let mesDetectado = null;
+        monthColumns.forEach((col, index) => {
+            let rect = col.getBoundingClientRect();
 
-    monthColumns.forEach((col, index) => {
-        let rect = col.getBoundingClientRect();
+            if (
+                e.clientX >= rect.left &&
+                e.clientX <= rect.right
+            ) {
+                mesDetectado = index;
+            }
+        });
 
-        if (
-            e.clientX >= rect.left &&
-            e.clientX <= rect.right
-        ) {
-            mesDetectado = index;
+        if (mesDetectado !== null) {
+            actualizarInfoBar(dayIndex + 1, mesDetectado);
+        } else {
+            actualizarInfoBar(null, null);
         }
-    });
 
-    if (mesDetectado !== null) {
-        actualizarInfoBar(dayIndex + 1, mesDetectado);
     } else {
+        hoverLine.style.display = "none";
         actualizarInfoBar(null, null);
     }
 });

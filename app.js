@@ -1,5 +1,6 @@
 let calendar = document.getElementById("calendar");
 let currentYear = new Date().getFullYear();
+let calendarMetrics;
 
 const BAR_WIDTH = 12;
 const BAR_GAP = 4;
@@ -225,8 +226,6 @@ function mostrarVistaMensual(mesIndex) {
     yearView.style.display = "none";
     monthView.style.display = "block";
 
-    calcularDimensiones(); // 🔥 recalcular métricas para nueva vista
-
     construirVistaMensual(mesIndex);
 }
 
@@ -261,17 +260,15 @@ function construirVistaMensual(mesIndex) {
     monthView.appendChild(tabla);
 }
 
-let calendarMetrics;
-
 function calcularDimensiones() {
     let calRect = calendar.getBoundingClientRect();
     let headerHeight = 40;
+    let dayHeight = (calRect.height - headerHeight) / 31;
 
     calendarMetrics = {
         top: calRect.top,
-        height: calRect.height,
-        dayHeight: (calRect.height - headerHeight) / 31,
-        headerHeight
+        headerHeight,
+        dayHeight
     };
 }
 
@@ -280,30 +277,30 @@ window.addEventListener("resize", calcularDimensiones);
 
 calendar.addEventListener("mousemove", (e) => {
     let { top, dayHeight, headerHeight } = calendarMetrics;
-
-    let y = e.clientY - top;
-
-    if (y <= headerHeight) {
+    
+    let y = e.clientY - calendarMetrics.top;
+    
+    if (y <= calendarMetrics.headerHeight) {
         hoverLine.style.display = "none";
         actualizarInfoBar(null, null);
         return;
     }
-
-    let dayIndex = Math.floor((y - headerHeight) / dayHeight);
-
+    
+    let dayIndex = Math.floor((y - calendarMetrics.headerHeight) / calendarMetrics.dayHeight);
+    
     if (dayIndex >= 0 && dayIndex < 31) {
         hoverLine.style.display = "block";
-        hoverLine.style.top = (headerHeight + dayIndex * dayHeight) + "px";
-        hoverLine.style.height = dayHeight + "px";
-
-            // 🔹 Detectar mes por posición horizontal
+        hoverLine.style.top = (calendarMetrics.headerHeight + dayIndex * calendarMetrics.dayHeight) + "px";
+        hoverLine.style.height = calendarMetrics.dayHeight + "px";
+        
+        // 🔹 Detectar mes por posición horizontal
         let monthColumns = document.querySelectorAll(".month-column");
-
+        
         let mesDetectado = null;
-
+        
         monthColumns.forEach((col, index) => {
             let rect = col.getBoundingClientRect();
-
+            
             if (
                 e.clientX >= rect.left &&
                 e.clientX <= rect.right
@@ -328,4 +325,5 @@ window.addEventListener("load", () => {
     ajustarAnchoColumnas();
     crearPanelEmpleados();
     pintarVacaciones();
+    calcularDimensiones();
 });

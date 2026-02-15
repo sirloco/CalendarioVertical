@@ -261,7 +261,7 @@ function construirVistaMensual(mesSeleccionado) {
     let grid = document.createElement("div");
     grid.classList.add("month-grid");
 
-    // 🔹 Calcular días por mes
+    // calcular días por mes
     let diasPorMes = [];
     let columnas = "";
 
@@ -273,7 +273,23 @@ function construirVistaMensual(mesSeleccionado) {
 
     grid.style.gridTemplateColumns = columnas;
 
-    // 🔹 CABECERA MESES (fila 1)
+    // 🟦 Añadir columnas de separadores verticales reales
+    // — inserta casillas con separador en todas las filas posteriores —
+
+    // --- ESPACIOS EN LA IZQUIERDA PARA ALINEAR ---
+    let spacer1 = document.createElement("div");
+    spacer1.classList.add("month-cell");
+    spacer1.style.border = "none";
+    spacer1.style.background = "transparent";
+    left.appendChild(spacer1);
+
+    let spacer2 = document.createElement("div");
+    spacer2.classList.add("month-cell");
+    spacer2.style.border = "none";
+    spacer2.style.background = "transparent";
+    left.appendChild(spacer2);
+
+    // 🟩 FILA NOMBRES DE MESES
     for (let mes = 0; mes < 12; mes++) {
 
         let dias = diasPorMes[mes];
@@ -297,7 +313,7 @@ function construirVistaMensual(mesSeleccionado) {
         grid.appendChild(monthHeader);
     }
 
-    // 🔹 FILA NÚMEROS (fila 2)
+    // 🟩 FILA NÚMEROS
     for (let mes = 0; mes < 12; mes++) {
 
         for (let d = 1; d <= diasPorMes[mes]; d++) {
@@ -305,12 +321,16 @@ function construirVistaMensual(mesSeleccionado) {
             let dayCell = document.createElement("div");
             dayCell.classList.add("month-cell");
 
-            grid.appendChild(dayCell);
+            if (mes > 0 && d === 1) {
+                dayCell.classList.add("month-separator");
+            }
+
             dayCell.textContent = d;
+            grid.appendChild(dayCell);
         }
     }
 
-    // 🔹 FILAS EMPLEADOS
+    // 🟩 FILAS EMPLEADOS
     empleados.forEach((empleado) => {
 
         let nameCell = document.createElement("div");
@@ -324,6 +344,10 @@ function construirVistaMensual(mesSeleccionado) {
 
                 let cell = document.createElement("div");
                 cell.classList.add("month-cell");
+
+                if (mes > 0 && d === 1) {
+                    cell.classList.add("month-separator");
+                }
 
                 empleado.vacaciones.forEach(vacacion => {
 
@@ -349,7 +373,7 @@ function construirVistaMensual(mesSeleccionado) {
     container.appendChild(right);
     monthView.appendChild(container);
 
-    // 🔹 Scroll centrado elegante
+    // 🔹 scroll centrado elegante
     let offset = 0;
     for (let i = 0; i < mesSeleccionado; i++) {
         offset += diasPorMes[i] * 35;
@@ -359,6 +383,7 @@ function construirVistaMensual(mesSeleccionado) {
     let anchoContenedor = right.clientWidth;
 
     right.scrollLeft = offset - (anchoContenedor / 2) + (anchoMes / 2);
+
 }
 
 function capitalizar(texto) {

@@ -95,11 +95,15 @@
     display: grid;
 }
 
-.month-grid .month-cell {
-    border: 1px solid #eee;
-    padding: 6px;
-    font-size: 13px;
-    text-align: center;
+.month-left {
+    width: 150px;
+    background: transparent;
+    position: relative;
+}
+
+.month-left .month-cell {
+    background: white;
+    border-right: 1px solid #ddd;
 }
 
 .month-container {
@@ -109,13 +113,10 @@
     overflow: hidden;
 }
 
-.month-left {
-    width: 150px;
-    background: white;
-    z-index: 20;
-}
 
 .month-cell {
+    border-right: 1px solid #eee;
+    border-bottom: 1px solid #eee;
     padding: 6px;
     font-size: 13px;
     height: 32px;
@@ -125,9 +126,11 @@
 }
 
 .month-left .month-cell {
-    justify-content: flex-start;
-    font-weight: bold;
+    height: 32px;
+    display: flex;
+    align-items: center;
     padding-left: 10px;
+    font-weight: bold;
 }
 
 .month-separator {

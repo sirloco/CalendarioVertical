@@ -74,3 +74,15 @@
     gap: 6px;
     font-size: 14px;
 }
+
+#info-bar {
+    margin: 10px 0;
+    padding: 8px 12px;
+    background-color: #f8f9fa;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    font-size: 14px;
+    min-height: 38px;
+    display: flex;
+    align-items: center;
+}

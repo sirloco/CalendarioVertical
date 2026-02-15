@@ -116,20 +116,15 @@ function pintarVacaciones() {
             bar.dataset.employee = indexEmpleado;
             bar.style.backgroundColor = empleado.color;
 
-            let headerHeight = 40;
-            let calendarRect = calendar.getBoundingClientRect();
-            let dayHeight = (calendarRect.height - headerHeight) / 31;
+            let columnRect = monthColumn.getBoundingClientRect();
+            let dayHeight = columnRect.height / 31;
 
-            bar.style.top =
-                headerHeight + (diaInicio - 1) * dayHeight + "px";
+            bar.style.top = (diaInicio - 1) * dayHeight + "px";
 
-            bar.style.height =
-                (diaFin - diaInicio + 1) * dayHeight + "px";
+            bar.style.height = (diaFin - diaInicio + 1) * dayHeight + "px";
 
             // 🔹 Carril fijo por empleado
-            let leftPosition =
-                COLUMN_PADDING +
-                indexEmpleado * (BAR_WIDTH + BAR_GAP);
+            let leftPosition = COLUMN_PADDING + indexEmpleado * (BAR_WIDTH + BAR_GAP);
 
             bar.style.left = leftPosition + "px";
             bar.style.width = BAR_WIDTH + "px";
@@ -183,30 +178,102 @@ function actualizarVisibilidad() {
     });
 }
 
+function actualizarInfoBar(dia, mes) {
+
+    let infoBar = document.getElementById("info-bar");
+
+    if (dia === null || mes === null) {
+        infoBar.textContent = "";
+        return;
+    }
+
+    let fecha = new Date(currentYear, mes, dia);
+    let fechaTexto = fecha.toLocaleDateString("es-ES", {
+        day: "numeric",
+        month: "long",
+        year: "numeric"
+    });
+
+    let empleadosActivos = [];
+
+    empleados.forEach((empleado, index) => {
+
+        let checkbox = document.querySelector(
+            `#employee-panel input[data-index="${index}"]`
+        );
+
+        if (!checkbox || !checkbox.checked) return;
+
+        empleado.vacaciones.forEach(vacacion => {
+
+            let inicio = new Date(vacacion.inicio);
+            let fin = new Date(vacacion.fin);
+
+            if (
+                mes === inicio.getMonth() &&
+                dia >= inicio.getDate() &&
+                dia <= fin.getDate()
+            ) {
+                empleadosActivos.push(empleado.nombre);
+            }
+        });
+    });
+
+    if (empleadosActivos.length === 0) {
+        infoBar.textContent = "";
+    } else {
+        infoBar.textContent =
+            `📅 ${fechaTexto} — Vacaciones: ${empleadosActivos.join(", ")}`;
+    }
+}
 
 calendar.addEventListener("mousemove", (e) => {
 
     let calendarRect = calendar.getBoundingClientRect();
     let y = e.clientY - calendarRect.top;
+    let x = e.clientX - calendarRect.left;
 
     let headerHeight = 40;
 
     if (y <= headerHeight) {
         hoverLine.style.display = "none";
+        actualizarInfoBar(null, null);
         return;
     }
 
     let dayHeight = (calendarRect.height - headerHeight) / 31;
     let dayIndex = Math.floor((y - headerHeight) / dayHeight);
 
-    if (dayIndex >= 0 && dayIndex < 31) {
-
-        hoverLine.style.display = "block";
-        hoverLine.style.top = (headerHeight + dayIndex * dayHeight) + "px";
-        hoverLine.style.height = dayHeight + "px";
-
-    } else {
+    if (dayIndex < 0 || dayIndex >= 31) {
         hoverLine.style.display = "none";
+        actualizarInfoBar(null, null);
+        return;
+    }
+
+    hoverLine.style.display = "block";
+    hoverLine.style.top = (headerHeight + dayIndex * dayHeight) + "px";
+    hoverLine.style.height = dayHeight + "px";
+
+    // 🔹 Detectar mes por posición horizontal
+    let monthColumns = document.querySelectorAll(".month-column");
+
+    let mesDetectado = null;
+
+    monthColumns.forEach((col, index) => {
+        let rect = col.getBoundingClientRect();
+
+        if (
+            e.clientX >= rect.left &&
+            e.clientX <= rect.right
+        ) {
+            mesDetectado = index;
+        }
+    });
+
+    if (mesDetectado !== null) {
+        actualizarInfoBar(dayIndex + 1, mesDetectado);
+    } else {
+        actualizarInfoBar(null, null);
     }
 });
 

@@ -249,14 +249,14 @@ function construirVistaMensual(mesSeleccionado) {
 
     monthView.appendChild(volverBtn);
 
-    let container = document.createElement("div");
-    container.classList.add("month-container");
+    let wrapper = document.createElement("div");
+    wrapper.classList.add("month-view-grid");
 
     let left = document.createElement("div");
-    left.classList.add("month-left");
+    left.classList.add("month-left-fixed");
 
     let right = document.createElement("div");
-    right.classList.add("month-right");
+    right.classList.add("month-right-scroll");
 
     let grid = document.createElement("div");
     grid.classList.add("month-grid");
@@ -369,9 +369,9 @@ function construirVistaMensual(mesSeleccionado) {
     });
 
     right.appendChild(grid);
-    container.appendChild(left);
-    container.appendChild(right);
-    monthView.appendChild(container);
+    wrapper.appendChild(left);
+    wrapper.appendChild(right);
+    monthView.appendChild(wrapper);
 
     // 🔹 scroll centrado elegante
     let offset = 0;

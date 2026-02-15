@@ -40,6 +40,10 @@ calendar.appendChild(emptyCorner);
 
     header.textContent = monthName.charAt(0).toUpperCase() + monthName.slice(1);
 
+    header.style.cursor = "pointer";
+
+    header.addEventListener("click", () => { mostrarVistaMensual(monthIndex);});
+
     calendar.appendChild(header);
 });
 
@@ -211,6 +215,50 @@ function actualizarInfoBar(dia, mes) {
     } else {
         infoBar.textContent = `📅 ${fechaTexto} — Vacaciones: ${empleadosActivos.join(", ")}`;
     }
+}
+
+function mostrarVistaMensual(mesIndex) {
+
+    let yearView = document.getElementById("year-view");
+    let monthView = document.getElementById("month-view");
+
+    yearView.style.display = "none";
+    monthView.style.display = "block";
+
+    calcularDimensiones(); // 🔥 recalcular métricas para nueva vista
+
+    construirVistaMensual(mesIndex);
+}
+
+function construirVistaMensual(mesIndex) {
+
+    let monthView = document.getElementById("month-view");
+    monthView.innerHTML = "";
+
+    let nombreMes = new Date(currentYear, mesIndex, 1).toLocaleString("es-ES", { month: "long" });
+
+    let titulo = document.createElement("h2");
+    titulo.textContent = nombreMes.charAt(0).toUpperCase() + nombreMes.slice(1) + " " + currentYear;
+
+    monthView.appendChild(titulo);
+
+    let volverBtn = document.createElement("button");
+    volverBtn.textContent = "← Volver a vista anual";
+
+    volverBtn.addEventListener("click", () => {
+        monthView.style.display = "none";
+        document.getElementById("year-view").style.display = "block";
+        calcularDimensiones(); // 🔥 recalcular métricas
+
+    });
+
+    monthView.appendChild(volverBtn);
+
+    let tabla = document.createElement("div");
+    tabla.style.marginTop = "20px";
+    tabla.textContent = "Aquí irá la tabla mensual...";
+
+    monthView.appendChild(tabla);
 }
 
 let calendarMetrics;

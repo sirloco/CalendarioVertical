@@ -273,19 +273,18 @@ function construirVistaMensual(mesSeleccionado) {
 
     grid.style.gridTemplateColumns = columnas;
 
-    // 🔹 Cabecera izquierda (vacía)
-    let emptyTop = document.createElement("div");
-    emptyTop.classList.add("month-cell");
-    emptyTop.textContent = "";
-    left.appendChild(emptyTop);
-
-    // 🔹 Cabecera meses
+    // 🔹 CABECERA MESES (fila 1)
     for (let mes = 0; mes < 12; mes++) {
 
         let dias = diasPorMes[mes];
 
         let monthHeader = document.createElement("div");
-        monthHeader.classList.add("month-cell", "month-separator");
+        monthHeader.classList.add("month-cell");
+
+        if (mes > 0) {
+            monthHeader.classList.add("month-separator");
+        }
+
         monthHeader.style.gridColumn = "span " + dias;
         monthHeader.style.backgroundColor = "#f3f4f6";
         monthHeader.style.fontWeight = "bold";
@@ -298,18 +297,20 @@ function construirVistaMensual(mesSeleccionado) {
         grid.appendChild(monthHeader);
     }
 
-    // 🔹 Fila números
+    // 🔹 FILA NÚMEROS (fila 2)
     for (let mes = 0; mes < 12; mes++) {
+
         for (let d = 1; d <= diasPorMes[mes]; d++) {
+
             let dayCell = document.createElement("div");
             dayCell.classList.add("month-cell");
-            if (d === 1) dayCell.classList.add("month-separator");
-            dayCell.textContent = d;
+
             grid.appendChild(dayCell);
+            dayCell.textContent = d;
         }
     }
 
-    // 🔹 Filas empleados
+    // 🔹 FILAS EMPLEADOS
     empleados.forEach((empleado) => {
 
         let nameCell = document.createElement("div");
@@ -323,7 +324,6 @@ function construirVistaMensual(mesSeleccionado) {
 
                 let cell = document.createElement("div");
                 cell.classList.add("month-cell");
-                if (d === 1) cell.classList.add("month-separator");
 
                 empleado.vacaciones.forEach(vacacion => {
 
@@ -349,7 +349,7 @@ function construirVistaMensual(mesSeleccionado) {
     container.appendChild(right);
     monthView.appendChild(container);
 
-    // 🔹 Scroll centrado
+    // 🔹 Scroll centrado elegante
     let offset = 0;
     for (let i = 0; i < mesSeleccionado; i++) {
         offset += diasPorMes[i] * 35;

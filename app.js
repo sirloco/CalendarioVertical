@@ -277,6 +277,7 @@ function construirVistaMensual(mesSeleccionado) {
     // — inserta casillas con separador en todas las filas posteriores —
 
     // --- ESPACIOS EN LA IZQUIERDA PARA ALINEAR ---
+
     let spacer1 = document.createElement("div");
     spacer1.classList.add("month-cell");
     spacer1.style.border = "none";

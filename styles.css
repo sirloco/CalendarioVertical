@@ -160,19 +160,15 @@
 
 /* Nuevo layout grid para vista mensual */
 .month-view-grid {
-  display: grid;
-  grid-template-columns: 150px 1fr;
+  display: flex;
 }
 
 .month-left-fixed {
-  grid-column: 1;
-  grid-row: 2; /* queda debajo de la cabecera */
+  width: 150px;
 }
 
 .month-right-scroll {
-  grid-column: 2;
-  grid-row: 1;
-  overflow-x: auto;
-  overflow-y: auto;
+  flex: 1;
+  overflow: auto;
 }
 

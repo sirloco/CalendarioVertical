@@ -229,16 +229,13 @@ function mostrarVistaMensual(mesIndex) {
     construirVistaMensual(mesIndex);
 }
 
-function construirVistaMensual(mesIndex) {
+function construirVistaMensual(mesSeleccionado) {
 
     let monthView = document.getElementById("month-view");
     monthView.innerHTML = "";
 
-    let nombreMes = new Date(currentYear, mesIndex, 1).toLocaleString("es-ES", { month: "long" });
-
     let titulo = document.createElement("h2");
-    titulo.textContent = nombreMes.charAt(0).toUpperCase() + nombreMes.slice(1) + " " + currentYear;
-
+    titulo.textContent = "Vista mensual " + currentYear;
     monthView.appendChild(titulo);
 
     let volverBtn = document.createElement("button");
@@ -247,17 +244,125 @@ function construirVistaMensual(mesIndex) {
     volverBtn.addEventListener("click", () => {
         monthView.style.display = "none";
         document.getElementById("year-view").style.display = "block";
-        calcularDimensiones(); // 🔥 recalcular métricas
-
+        calcularDimensiones();
     });
 
     monthView.appendChild(volverBtn);
 
-    let tabla = document.createElement("div");
-    tabla.style.marginTop = "20px";
-    tabla.textContent = "Aquí irá la tabla mensual...";
+    let container = document.createElement("div");
+    container.classList.add("month-container");
 
-    monthView.appendChild(tabla);
+    let left = document.createElement("div");
+    left.classList.add("month-left");
+
+    let right = document.createElement("div");
+    right.classList.add("month-right");
+
+    let grid = document.createElement("div");
+    grid.classList.add("month-grid");
+
+    // 🔹 Calcular días por mes
+    let diasPorMes = [];
+    let columnas = "";
+
+    for (let mes = 0; mes < 12; mes++) {
+        let dias = new Date(currentYear, mes + 1, 0).getDate();
+        diasPorMes.push(dias);
+        columnas += "repeat(" + dias + ", 35px) ";
+    }
+
+    grid.style.gridTemplateColumns = columnas;
+
+    // 🔹 Cabecera izquierda (vacía)
+    let emptyTop = document.createElement("div");
+    emptyTop.classList.add("month-cell");
+    emptyTop.textContent = "";
+    left.appendChild(emptyTop);
+
+    // 🔹 Cabecera meses
+    for (let mes = 0; mes < 12; mes++) {
+
+        let dias = diasPorMes[mes];
+
+        let monthHeader = document.createElement("div");
+        monthHeader.classList.add("month-cell", "month-separator");
+        monthHeader.style.gridColumn = "span " + dias;
+        monthHeader.style.backgroundColor = "#f3f4f6";
+        monthHeader.style.fontWeight = "bold";
+
+        let nombreMes = new Date(currentYear, mes, 1)
+            .toLocaleString("es-ES", { month: "long" });
+
+        monthHeader.textContent = capitalizar(nombreMes);
+
+        grid.appendChild(monthHeader);
+    }
+
+    // 🔹 Fila números
+    for (let mes = 0; mes < 12; mes++) {
+        for (let d = 1; d <= diasPorMes[mes]; d++) {
+            let dayCell = document.createElement("div");
+            dayCell.classList.add("month-cell");
+            if (d === 1) dayCell.classList.add("month-separator");
+            dayCell.textContent = d;
+            grid.appendChild(dayCell);
+        }
+    }
+
+    // 🔹 Filas empleados
+    empleados.forEach((empleado) => {
+
+        let nameCell = document.createElement("div");
+        nameCell.classList.add("month-cell");
+        nameCell.textContent = empleado.nombre;
+        left.appendChild(nameCell);
+
+        for (let mes = 0; mes < 12; mes++) {
+
+            for (let d = 1; d <= diasPorMes[mes]; d++) {
+
+                let cell = document.createElement("div");
+                cell.classList.add("month-cell");
+                if (d === 1) cell.classList.add("month-separator");
+
+                empleado.vacaciones.forEach(vacacion => {
+
+                    let inicio = new Date(vacacion.inicio);
+                    let fin = new Date(vacacion.fin);
+
+                    if (
+                        mes === inicio.getMonth() &&
+                        d >= inicio.getDate() &&
+                        d <= fin.getDate()
+                    ) {
+                        cell.style.backgroundColor = empleado.color;
+                    }
+                });
+
+                grid.appendChild(cell);
+            }
+        }
+    });
+
+    right.appendChild(grid);
+    container.appendChild(left);
+    container.appendChild(right);
+    monthView.appendChild(container);
+
+    // 🔹 Scroll centrado
+    let offset = 0;
+    for (let i = 0; i < mesSeleccionado; i++) {
+        offset += diasPorMes[i] * 35;
+    }
+
+    let anchoMes = diasPorMes[mesSeleccionado] * 35;
+    let anchoContenedor = right.clientWidth;
+
+    right.scrollLeft = offset - (anchoContenedor / 2) + (anchoMes / 2);
+}
+
+function capitalizar(texto) {
+    return texto.charAt(0).toUpperCase() + texto.slice(1);
 }
 
 function calcularDimensiones() {
